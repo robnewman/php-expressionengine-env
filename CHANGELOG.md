@@ -1,0 +1,13 @@
+php-expressionengine-env CHANGELOG
+==================================
+
+This file is used to list changes made in each version of the php-expressionengine-env cookbook.
+
+0.1.0
+-----
+- [Rob Newman] - Initial release of php-expressionengine-env
+
+- - -
+Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
+
+The [Github Flavored Markdown page](http://github.github.com/github-flavored-markdown/) describes the differences between markdown on github and standard markdown.

@@ -40,6 +40,13 @@ addition to `apt` and `user::data_bag`.
 }
 ```
 
+Further Reading
+---------------
+
+* ExpressionEngine website: http://ellislab.com/expressionengine
+* Their installation guide: http://ellislab.com/expressionengine/user-guide/installation/installation.html
+* Their best practices: http://ellislab.com/expressionengine/user-guide/installation/best_practices.html
+
 Contributing
 ------------
 Don't contribute just yet - this is purely for Rackspace DevOps to

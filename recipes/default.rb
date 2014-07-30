@@ -1,10 +1,8 @@
 #
-# Cookbook Name:: phpenv
+# Cookbook Name:: php-expressionengine-env
 # Recipe:: default
 #
 # Copyright 2014, Rob Newman
-#
-# All rights reserved - Do Not Redistribute
 #
 
 package "unzip" do

@@ -13,11 +13,11 @@ end
 include_recipe "vim"
 
 # Append server name
-[ node['phpenv']['ipv6_address'], node['phpenv']['ipv4_address'] ].each do |entry|
+[ node['php-expressionengine-env']['ipv6_address'], node['php-expressionengine-env']['ipv4_address'] ].each do |entry|
   hostsfile_entry "#{entry}" do
-    hostname node['phpenv']['vm_name']
-    aliases [ node['phpenv']['server_name'] ]
-    comment 'DNS entry appended by phpenv recipe'
+    hostname node['php-expressionengine-env']['vm_name']
+    aliases [ node['php-expressionengine-env']['server_name'] ]
+    comment 'DNS entry appended by php-expressionengine-env recipe'
     action :append
   end
 end
@@ -44,20 +44,20 @@ apache_site "default" do
 end
 
 # Build virtualhost
-web_app 'phpenv' do
+web_app 'php-expressionengine-env' do
   template 'site.conf.erb'
-  servername node['phpenv']['server_name'] # For global http.conf
-  iris_docroot node['phpenv']['iris_path'] + "/httpdocs"
-  iris_ip node['phpenv']['ipv4_address']
-  iris_serveradmin node['phpenv']['iris_server_admin']
-  iris_servername node['phpenv']['server_name']
-  iris_customlog_path node['phpenv']['iris_customlog_path']
-  iris_customlog_format node['phpenv']['iris_customlog_format']
-  iris_errorlog_path node['phpenv']['iris_errorlog_path']
+  servername node['php-expressionengine-env']['server_name'] # For global http.conf
+  iris_docroot node['php-expressionengine-env']['iris_path'] + "/httpdocs"
+  iris_ip node['php-expressionengine-env']['ipv4_address']
+  iris_serveradmin node['php-expressionengine-env']['iris_server_admin']
+  iris_servername node['php-expressionengine-env']['server_name']
+  iris_customlog_path node['php-expressionengine-env']['iris_customlog_path']
+  iris_customlog_format node['php-expressionengine-env']['iris_customlog_format']
+  iris_errorlog_path node['php-expressionengine-env']['iris_errorlog_path']
 end
 
 
-mysql_database node['phpenv']['database'] do
+mysql_database node['php-expressionengine-env']['database'] do
   connection ({:host => 'localhost', 
                :username => 'root',
                :password => node['mysql']['server_root_password']
@@ -65,13 +65,13 @@ mysql_database node['phpenv']['database'] do
   action :create
 end
 
-mysql_database_user node['phpenv']['db_username'] do
+mysql_database_user node['php-expressionengine-env']['db_username'] do
   connection ({:host => 'localhost',
                :username => 'root',
                :password => node['mysql']['server_root_password']
              })
-  password node['phpenv']['db_password']
-  database_name node['phpenv']['database']
+  password node['php-expressionengine-env']['db_password']
+  database_name node['php-expressionengine-env']['database']
   privileges [:select,:update,:insert,:create,:delete]
   action :grant
 end
@@ -79,12 +79,12 @@ end
 expression_engine_latest = Chef::Config[:file_cache_path] + "/expression-engine-latest.zip"
 
 remote_file expression_engine_latest do
-  source node["phpenv"]["ee_source"]
+  source node["php-expressionengine-env"]["ee_source"]
   mode "0644"
 end
 
 # Create vhosts dir
-directory node["phpenv"]["vhostsdir"] do
+directory node["php-expressionengine-env"]["vhostsdir"] do
   owner "root"
   group "root"
   mode "0755"
@@ -94,7 +94,7 @@ end
 
 
 # Create iris.edu
-directory node["phpenv"]["iris_path"] do
+directory node["php-expressionengine-env"]["iris_path"] do
   owner "root"
   group "root"
   mode "0755"
@@ -104,7 +104,7 @@ end
 
 # Create iris.edu web directory structure
 ['httpdocs', 'db_backups', 'scripts', 'statistics'].each do |webdir|
-  directory node["phpenv"]["iris_path"] + "/#{webdir}" do
+  directory node["php-expressionengine-env"]["iris_path"] + "/#{webdir}" do
     owner "root"
     group "root"
     mode "0755"
@@ -114,7 +114,7 @@ end
 end
 
 # Create the ugly /hq path
-directory node["phpenv"]["iris_path"] + "/httpdocs/hq" do
+directory node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq" do
   owner "root"
   group "root"
   mode "0755"
@@ -127,14 +127,14 @@ end
 # ---------
 
 # Unzip EE
-default_system = node['phpenv']['iris_path'] + "/httpdocs/hq/system"
-secure_system = node['phpenv']['iris_path'] + "/system"
-config_dir = node['phpenv']['iris_path'] + "/config"
+default_system = node['php-expressionengine-env']['iris_path'] + "/httpdocs/hq/system"
+secure_system = node['php-expressionengine-env']['iris_path'] + "/system"
+config_dir = node['php-expressionengine-env']['iris_path'] + "/config"
 
 execute "unzip-expression-engine" do
-  cwd node['phpenv']['iris_path'] + "/httpdocs/hq"
+  cwd node['php-expressionengine-env']['iris_path'] + "/httpdocs/hq"
   command "unzip " + expression_engine_latest
-  creates node['phpenv']['iris_path'] + "/httpdocs/hq/system/expressionengine/config/database.php"
+  creates node['php-expressionengine-env']['iris_path'] + "/httpdocs/hq/system/expressionengine/config/database.php"
   not_if { File.exists?(secure_system) }
 end
 
@@ -142,17 +142,17 @@ end
 # Source: http://ellislab.com/expressionengine/user-guide/installation/installation.html
 file_permissions = {
   "0666" => [
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/system/expressionengine/config/config.php",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/system/expressionengine/config/database.php"
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/system/expressionengine/config/config.php",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/system/expressionengine/config/database.php"
   ],
   "0777" => [
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/system/expressionengine/cache",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/avatars/uploads",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/captchas",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/member_photos",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/pm_attachments",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/signature_attachments",
-    node["phpenv"]["iris_path"] + "/httpdocs/hq/images/uploads"
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/system/expressionengine/cache",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/avatars/uploads",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/captchas",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/member_photos",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/pm_attachments",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/signature_attachments",
+    node["php-expressionengine-env"]["iris_path"] + "/httpdocs/hq/images/uploads"
   ]
 }
 
